@@ -10,13 +10,21 @@ let studentData = JSON.parse(rawdata);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+
+
+//RETURNS ALL REGISTERED STUDENTS
  app.get('/students/', (req, res) => res.send(studentData))
- http://localhost:3000/students/
+ //http://localhost:3000/students/
+
+
+ //RETURNS A STUDENT BY ID
 app.get('/students/student/:id', (req, res) => {
     res.send(studentData.filter(student => student.id == req.params.id)[0])
 })
-http://localhost:3000/students/student/3
+//http://localhost:3000/students/student/3
 
+
+//RETURNS THE RESULT OF A LOGICAL AND ON SEVERAL STUDENT VALUES
 app.get('/students/search/', (req, res) => {
     // res.send(res.query)
     //res.send(studentData.filter(student => student.id == req.query.id))
@@ -55,7 +63,7 @@ app.get('/grades/:id', (req, res) => {
 //http://localhost:3000/grades/3
 
 
-
+//UPDATES THE GRADES OF A STUDENT AND RECALCULATES THE GPA
 app.post('/grades', (req, res) => {
     let studentID = req.body.id
     let studentGrade = req.body.grade
@@ -79,6 +87,8 @@ app.post('/grades', (req, res) => {
    res.json(result)
 })
 
+
+//REGISTERS A NEW STUDENT USING THAT FOLLOWS THE TEMPLATE ON LINE 99
 app.post('/register', (req, res) => {
     let fName = req.body.firstName
     let lName = req.body.lastName
@@ -86,7 +96,7 @@ app.post('/register', (req, res) => {
     if((fName !== undefined) && (lName !== undefined))  { //make sure that both an ID and grade are included
         queryParams = Object.keys(req.body).filter(item => Object.keys(studentData[0]).includes(item))
         //template Student
-        let studentTemplete = {
+        let newStudent = {
             firstName:  '',
             lastName: '',
             id : '',
@@ -95,9 +105,6 @@ app.post('/register', (req, res) => {
             year : '',
             grades:[],
             gpa : ''
-        }
-        let newStudent ={ 
-            ...studentTemplete,
         }
         queryParams.forEach(key =>{
             newStudent[key] = req.body[key]
@@ -114,38 +121,5 @@ app.post('/register', (req, res) => {
    res.json(result)
 })
 
-
-
-
-
-
-
-
-// app.post('/', (req, res) => {
-//     let name = req.body.name
-//     if(name !== undefined) { //forces name to exist to continue. A name is mandatory.
-//         let newUserID = 1000
-//         req.body.id = newUserID
-//         users.push(req.body)
-//          result = {status: "success", message: "The user was added"}
-//     } else {
-//          result = {status: "Failed", message: "The  was not added"}
-//         res.status(400)
-//     }
-//    res.json(result)
-// })
-
-// app.get('/search', (req, res) => { //?name=?
-//     //res.send(res.query)
-//     let name = req.query.name
-//     res.send(usersData.find(user => user.name[0] == name || user.name[1] == name ))
-// })
-
 const port = 3000
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
-
-/*
-http://localhost:3000/users/?id=1
-http://localhost:3000/users/
-http://localhost:3000/search/?name=Shana
-*/
