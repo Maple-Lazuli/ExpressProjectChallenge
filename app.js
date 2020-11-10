@@ -11,10 +11,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
  app.get('/students/', (req, res) => res.send(studentData))
-
+ http://localhost:3000/students/
 app.get('/students/student/:id', (req, res) => {
     res.send(studentData.filter(student => student.id == req.params.id)[0])
 })
+http://localhost:3000/students/student/3
 
 app.get('/students/search/', (req, res) => {
     // res.send(res.query)
@@ -22,8 +23,7 @@ app.get('/students/search/', (req, res) => {
 
 
     //Verify that parameters are searchable
-    let queryParams = Object.keys(req.query)
-    queryParams = Object.keys(req.query).filter(item => Object.keys(studentData[0]).includes(item))
+    let queryParams = Object.keys(req.query).filter(item => Object.keys(studentData[0]).includes(item))
     let invalidParams =  Object.keys(req.query).filter(item => !Object.keys(studentData[0]).includes(item))
     let returnData = []
 
@@ -52,6 +52,75 @@ app.get('/students/search/', (req, res) => {
 app.get('/grades/:id', (req, res) => {
     res.send(studentData.filter(student => student.id == req.params.id)[0].grades)
 })
+//http://localhost:3000/grades/3
+
+
+
+app.post('/grades', (req, res) => {
+    let studentID = req.body.id
+    let studentGrade = req.body.grade
+
+    if((studentID !== undefined) && (studentGrade !== undefined))  { //make sure that both an ID and grade are included
+         //makesure userID is valid
+         student =studentData.filter(student => student.id == studentID)
+         if(student.length !== 0){
+            student[0].grades.push(parseInt(studentGrade))
+            student[0].gpa =  student[0].grades.reduce((a,c) => a + c)/student[0].grades.length
+            result = {status: "success", message: `Grade of ${studentGrade} was added. Grades are now ${student[0].grades}. New GPA is ${student[0].gpa}`}
+            res.status(200)
+         } else{
+            result = {status: "Failed", message: "Student Not Found"}
+            res.status(400)
+         }
+    } else {
+         result = {status: "Failed", message: "Invalid POST. ID and Grade are required."}
+        res.status(400)
+    }
+   res.json(result)
+})
+
+app.post('/register', (req, res) => {
+    let fName = req.body.firstName
+    let lName = req.body.lastName
+
+    if((fName !== undefined) && (lName !== undefined))  { //make sure that both an ID and grade are included
+        queryParams = Object.keys(req.body).filter(item => Object.keys(studentData[0]).includes(item))
+        //template Student
+        let studentTemplete = {
+            firstName:  '',
+            lastName: '',
+            id : '',
+            major : '',
+            gender : '',
+            year : '',
+            grades:[],
+            gpa : ''
+        }
+        let newStudent ={ 
+            ...studentTemplete,
+        }
+        queryParams.forEach(key =>{
+            newStudent[key] = req.body[key]
+        })
+
+        newStudent.id = studentData.length + 1
+        studentData.push(newStudent)
+        result ={status:"Success", message: `Student was added with the following parameters: ${JSON.stringify(newStudent)}`}
+
+    } else {
+         result = {status: "Failed", message: "Invalid POST. FirstName and Lastname are required at minimum"}
+        res.status(400)
+    }
+   res.json(result)
+})
+
+
+
+
+
+
+
+
 // app.post('/', (req, res) => {
 //     let name = req.body.name
 //     if(name !== undefined) { //forces name to exist to continue. A name is mandatory.
