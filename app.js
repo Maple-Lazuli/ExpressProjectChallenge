@@ -10,9 +10,13 @@ let studentData = JSON.parse(rawdata);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//app.get('/students', (req, res) => res.send(studentData))
+ app.get('/students/', (req, res) => res.send(studentData))
 
-app.get('/students/search', (req, res) => {
+app.get('/students/student/:id', (req, res) => {
+    res.send(studentData.filter(student => student.id == req.params.id)[0])
+})
+
+app.get('/students/search/', (req, res) => {
     // res.send(res.query)
     //res.send(studentData.filter(student => student.id == req.query.id))
 
@@ -34,7 +38,6 @@ app.get('/students/search', (req, res) => {
         studentData.forEach(student => { //For each student, see if the student has the desired values for each property
             toPush = true
             queryParams.forEach(key => {
-                console.log(student[key])
                 if(req.query[key] != student[key])
                     toPush = false
             })
@@ -45,8 +48,10 @@ app.get('/students/search', (req, res) => {
         invalidParams.length>0 ? res.send([{"Invalid Search Parameters": invalidParams},returnData]) : res.send(returnData)
     }
 })
-
-
+//http://localhost:3000/students/search/?firstName=Calissa
+app.get('/grades/:id', (req, res) => {
+    res.send(studentData.filter(student => student.id == req.params.id)[0].grades)
+})
 // app.post('/', (req, res) => {
 //     let name = req.body.name
 //     if(name !== undefined) { //forces name to exist to continue. A name is mandatory.
