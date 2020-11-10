@@ -1,40 +1,51 @@
 const express = require('express')
 const app = express()
-const users = require('./users.json')
+const students = require('./studentData.json')
 const bodyParser = require('body-parser')
 const fs = require('fs');
-const { RSA_NO_PADDING } = require('constants');
 let rawdata = fs.readFileSync('studentData.json');
 let studentData = JSON.parse(rawdata);
 
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get('/students', (req, res) => res.send(studentData))
+//app.get('/students', (req, res) => res.send(studentData))
 
 app.get('/students/search', (req, res) => {
-    //student Object Template
-    let studentTemplete = {
-        id : '',
-        major : '',
-        gender : '',
-        year : '',
-        gpa : ''
-    }
-    //Extract the parameters that are in the student template
+    // res.send(res.query)
+    //res.send(studentData.filter(student => student.id == req.query.id))
+
+
+    //Verify that parameters are searchable
     let queryParams = Object.keys(req.query)
-    let queryParams = queryParams.filter(item => Object.keys(studentTemplete).includes(item))
+    queryParams = Object.keys(req.query).filter(item => Object.keys(studentData[0]).includes(item))
+    let invalidParams =  Object.keys(req.query).filter(item => !Object.keys(studentData[0]).includes(item))
     let returnData = []
-    if(queryParams.length === 0){ //Invalid request
-        result = {status: "Failed", message: "Invalid parameters"}
+
+     //Invalid request since none of the parameters are in the student object
+    if (queryParams.length === 0) {
+        result = { status: "Failed", message: "Invalid Search parameters" }
         res.status(400)
-        res..send(result)
-    } else {
-        res.status(200)
-        res.send(studentData.find(student => queryParams.filter(key => req.query.key === student.key)))
+        res.send(result)
+    } else { //Search on the valid parameters (peforms logical AND on valid parameters)
+        let toPush
+        
+        studentData.forEach(student => { //For each student, see if the student has the desired values for each property
+            toPush = true
+            queryParams.forEach(key => {
+                console.log(student[key])
+                if(req.query[key] != student[key])
+                    toPush = false
+            })
+            if(toPush)
+                returnData.push(student)
+        });
+
+        invalidParams.length>0 ? res.send([{"Invalid Search Parameters": invalidParams},returnData]) : res.send(returnData)
     }
 })
+
 
 // app.post('/', (req, res) => {
 //     let name = req.body.name
