@@ -22,7 +22,7 @@ for(let i = 1; i < numStudents; i++){
     currentStudent.major = majors[Math.floor((Math.random() * majors.length))]
     currentStudent.gender = genders[Math.floor((Math.random() * genders.length))]
     currentStudent.year = year[Math.floor((Math.random() * year.length))]
-    currentStudent.gpa = Math.floor((Math.random() * 100) +  50)
+    currentStudent.gpa = Math.floor((Math.random() * (100 - 51)) +  50)
     studentJSON.push(currentStudent)    
 }
 
